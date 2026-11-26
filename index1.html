@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng ký thẻ thành viên Món Nghệ Việt Nam</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 30px;
+      }
+      input {
+        display: block;
+        margin-top: 10px;
+        padding: 8px;
+        font-size: 16px;
+        width: 280px;
+        border: 1px solid #888;
+      }
+      input.loi {
+        border: 2px solid red;
+      }
+      .dongLoi {
+        color: red;
+        font-size: 14px;
+        margin-top: 4px;
+      }
+      button {
+        margin-top: 12px;
+        padding: 8px 15px;
+        font-size: 26px;
+        cursor: pointer;
+      }
+      #thongBao {
+        margin-top: 15px;
+        font-size: 26px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>Dang ky the thanh vien mon nghe Viet Nam</h3>
+
+    <form id="formGui">
+      <input type="text" id="HovaTen" placeholder="Ho va Ten" />
+      <div id="loiHovaTen" class="dongLoi"></div>
+
+      <input type="text" id="Sdt" placeholder="Nhập 10 số (bắt đầu bằng 0)" />
+      <div id="loiSdt" class="dongLoi"></div>
+
+      <input type="text" id="Email" placeholder="Nhập email cua ban" />
+      <div id="loiEmail" class="dongLoi"></div>
+
+      <input type="text" id="SoKhachThuongDiCung" placeholder="So khach di cung (0-20)" />
+      <div id="loiSoKhachThuongDiCung" class="dongLoi"></div>
+
+      <button type="submit">Gửi đi</button>
+    </form>
+
+    <!-- Nơi hiển thị thông báo kết quả -->
+    <p id="thongBao"></p>
+
+    <script>
+      // 1. Lấy các phần tử trên trang
+      const form = document.querySelector("#formGui");
+      const oHovaTen = document.querySelector("#HovaTen");
+      const oSdt = document.querySelector("#Sdt");
+      const oEmail = document.querySelector("#Email");
+      const oSoKhachThuongDiCung = document.querySelector("#SoKhachThuongDiCung");
+
+      const loiHovaTen = document.querySelector("#loiHovaTen");
+      const loiSdt = document.querySelector("#loiSdt");
+      const loiEmail = document.querySelector("#loiEmail");
+      const loiSoKhachThuongDiCung = document.querySelector("#loiSoKhachThuongDiCung");
+      const thongBao = document.querySelector("#thongBao");
+
+      // Mẫu kiểm tra: 10 chữ số, bắt đầu bằng 0
+      const MAU_SDT = /^0\d{9}$/;
+      const MAU_Email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      // 2. Bắt sự kiện khi ấn nút gửi
+      form.addEventListener("submit", function (event) {
+        event.preventDefault(); // Chặn tải lại trang
+        thongBao.textContent = "";
+
+        let hopLe = true;
+        let oLoiDauTien = null;
+
+        // 3a. Kiểm tra Họ và tên: không để trống, tối thiểu 3 ký tự (sau trim)
+        const hoVaTen = oHovaTen.value.trim();
+        if (hoVaTen.length < 3) {
+oHovaTen.classList.add("loi");
+          loiHovaTen.textContent = "Họ tên không được để trống và tối thiểu 3 ký tự!";
+          hopLe = false;
+          if (!oLoiDauTien) oLoiDauTien = oHovaTen;
+        } else {
+          oHovaTen.classList.remove("loi");
+          loiHovaTen.textContent = "";
+        }
+
+        // 3b. Kiểm tra định dạng số điện thoại
+        const sdt = oSdt.value.trim(); // Lấy giá trị và xóa khoảng trắng thừa
+        if (MAU_SDT.test(sdt)) {
+          oSdt.classList.remove("loi");
+          loiSdt.textContent = "";
+        } else {
+          oSdt.classList.add("loi");
+          loiSdt.textContent = "Số điện thoại sai định dạng! Vui lòng nhập lại.";
+          hopLe = false;
+          if (!oLoiDauTien) oLoiDauTien = oSdt;
+        }
+
+        // 3c. Kiểm tra định dạng email
+        const email = oEmail.value.trim();
+        if (MAU_Email.test(email)) {
+          oEmail.classList.remove("loi");
+          loiEmail.textContent = "";
+        } else {
+          oEmail.classList.add("loi");
+          loiEmail.textContent = "Email không đúng định dạng! Vui lòng nhập lại.";
+          hopLe = false;
+          if (!oLoiDauTien) oLoiDauTien = oEmail;
+        }
+
+        // 3d. Kiểm tra Số khách thường đi cùng: số nguyên từ 0 đến 20
+        const soKhachStr = oSoKhachThuongDiCung.value.trim();
+        const soKhach = Number(soKhachStr);
+        if (soKhachStr !== "" && Number.isInteger(soKhach) && soKhach >= 0 && soKhach <= 20) {
+          oSoKhachThuongDiCung.classList.remove("loi");
+          loiSoKhachThuongDiCung.textContent = "";
+        } else {
+          oSoKhachThuongDiCung.classList.add("loi");
+          loiSoKhachThuongDiCung.textContent = "Số khách thường đi cùng phải là số nguyên từ 0 đến 20!";
+          hopLe = false;
+          if (!oLoiDauTien) oLoiDauTien = oSoKhachThuongDiCung;
+        }
+
+        // 4. Kết quả khi tất cả hợp lệ
+        if (hopLe) {
+          const tenKhach = hoVaTen.split(/\s+/).pop();
+          thongBao.style.color = "green";
+          thongBao.textContent = "Cảm ơn " + tenKhach + " đã đăng ký thẻ thành viên Món Nghệ!";
+          form.reset();
+        } else if (oLoiDauTien) {
+          // ⭐ Chuyển con trỏ chuột quay lại ô nhập bị lỗi đầu tiên để người dùng gõ lại ngay
+          oLoiDauTien.focus();
+          oLoiDauTien.select();
+        }
+      });
+    </script>
+  </body>
+</html>
